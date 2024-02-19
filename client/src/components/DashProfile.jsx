@@ -1,13 +1,15 @@
 import { Button, TextInput } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getStorage, uploadBytesResumable } from 'firebase/storage'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { app } from '../firebase';
 
 export default function DashProfile() {
     const { currentUser } = useSelector(state => state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl, setImageFileUrl] = useState(null);
+    const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
+    const [imageFileUploadError, setImageFileUploadError] = useState(null);
     const filePickerRef = useRef();
     
     const handleImageChange = (e) => {
@@ -26,9 +28,28 @@ export default function DashProfile() {
     const uploadImage = async () => {
         const storage = getStorage(app);
         const fileName = new Date().getTime() + imageFile.name;
-        const storageRef = ref(storege, fileName);
+        const storageRef = ref(storage, fileName);
         const uploadTask = uploadBytesResumable(storageRef, imageFile);
+        uploadTask.on('state_changed', (snapshot) => {
+            const progress = 
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+                setImageFileUploadProgress(progress.toFixed(0));
+        },
+        (error) => {
+            setImageFileUploadError(
+                'Could not upload image (File must be less than 2MB)'
+              );
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageFileUrl(downloadURL);
+            });
+        },
+        );
+    
     };
+    
     
     return (
     <div className='max-w-lg mx-auto p-3 w-full'>
