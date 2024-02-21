@@ -52,5 +52,4 @@ export const updateUser = async (req, res, next) => {
       } catch (error) {
         next(error);
       }
-    
 };
