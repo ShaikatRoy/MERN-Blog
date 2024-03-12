@@ -8,9 +8,10 @@ import 'react-circular-progressbar/dist/styles.css';
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signoutSuccess, updateFailure, updateStart, updateSuccess} from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { Link } from 'react-router-dom';    
 
 export default function DashProfile() {
-    const { currentUser, error } = useSelector(state => state.user);
+    const { currentUser, error, loading } = useSelector(state => state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl, setImageFileUrl] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -202,9 +203,22 @@ export default function DashProfile() {
                     placeholder='password'
                     onChange={handleChange}
                 />
-                <Button type='submit' gradientDuoTone='purpleToBlue' outline>
-                    Update
+                <Button type='submit' gradientDuoTone='purpleToBlue' outline
+                        disabled={loading || imageFileUploading}
+                >
+                    {loading ? 'Loading...' : 'Update'}
                 </Button>
+                {currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <Button
+              type='button'
+              gradientDuoTone='purpleToPink'
+              className='w-full'
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
                 <div className='text-red-500 flex justify-between mt-5'>
                     <span onClick={()=>setShowModal(true)} className='cursor-pointer'>Delete Account</span>
                     <span onClick={handleSignout} className='cursor-pointer'>Sign Out</span>
