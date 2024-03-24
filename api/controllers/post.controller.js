@@ -1,3 +1,4 @@
+import Post from '../models/post.model.js';
 import { errorHandler } from "../utils/error.js";
 
 export const create = async (req, res, next) => {
@@ -12,8 +13,8 @@ export const create = async (req, res, next) => {
     .split(' ')
     .join('-')
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9-]/g, '-');
-    const newPost = new Post({
+    .replace(/[^a-zA-Z0-9-]/g, '');
+    const newPost = new Post ({
         ...req.body,
         slug,
         userId: req.user.id,
